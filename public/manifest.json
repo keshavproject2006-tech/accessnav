@@ -1,0 +1,22 @@
+{
+  "short_name": "AccessNav",
+  "name": "AccessNav: AI Accessibility Navigator",
+  "description": "An AI assistant that helps people with visual, hearing, motor, and cognitive disabilities understand and navigate the physical and digital world.",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "display": "standalone",
+  "orientation": "portrait"
+}

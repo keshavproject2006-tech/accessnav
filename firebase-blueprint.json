@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User profile with accessibility settings and emergency details",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "onboardingComplete": { "type": "boolean" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "fontSize": { "type": "number" },
+            "highContrast": { "type": "boolean" },
+            "theme": { "type": "string" },
+            "dyslexiaFont": { "type": "boolean" },
+            "reducedMotion": { "type": "boolean" },
+            "colorBlindMode": { "type": "string" },
+            "ttsSpeed": { "type": "number" },
+            "language": { "type": "string" },
+            "hapticFeedback": { "type": "boolean" },
+            "disabilities": { "type": "array", "items": { "type": "string" } },
+            "emergencyContactName": { "type": "string" },
+            "emergencyContactPhone": { "type": "string" },
+            "emergencyMedicalNotes": { "type": "string" }
+          }
+        }
+      },
+      "required": ["uid"]
+    },
+    "SavedItem": {
+      "title": "Saved Item",
+      "description": "User saved history, captions, navigation logs, or scene descriptions",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "content"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account and accessibility settings"
+    },
+    "/users/{userId}/saved/{savedId}": {
+      "schema": "SavedItem",
+      "description": "User saved transcripts and notes"
+    }
+  }
+}

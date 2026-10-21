@@ -1,0 +1,12 @@
+{
+  "name": "AccessNav: AI Accessibility Navigator",
+  "description": "An AI assistant that helps people with visual, hearing, motor, and cognitive disabilities understand and navigate the physical and digital world.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

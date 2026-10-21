@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --app-font-scale: 1;
+    --focus-ring-color: #2563eb;
+  }
+
+  html {
+    font-size: calc(16px * var(--app-font-scale, 1));
+    scroll-behavior: smooth;
+  }
+
+  /* Accessibility focus ring: visible on keyboard navigation */
+  *:focus-visible {
+    outline: 3px solid var(--focus-ring-color) !important;
+    outline-offset: 3px !important;
+  }
+
+  /* Reduced motion preference */
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Dyslexia-friendly typography */
+.font-dyslexia {
+  font-family: 'Atkinson Hyperlegible', 'Lexend', system-ui, sans-serif !important;
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.75 !important;
+}
+
+/* High Contrast mode */
+.theme-high-contrast {
+  --focus-ring-color: #fbbf24;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.theme-high-contrast button,
+.theme-high-contrast input,
+.theme-high-contrast select,
+.theme-high-contrast textarea {
+  border-color: #ffffff !important;
+}
+
+/* Colorblind simulation/optimization filters */
+.colorblind-protanopia {
+  filter: url('#protanopia-filter');
+}
+
+.colorblind-deuteranopia {
+  filter: url('#deuteranopia-filter');
+}
+
+.colorblind-tritanopia {
+  filter: url('#tritanopia-filter');
+}
+
+.colorblind-monochrome {
+  filter: grayscale(100%) contrast(125%);
+}
+
+/* Safe touch target utility */
+.touch-target {
+  min-height: 48px;
+  min-width: 48px;
+}
