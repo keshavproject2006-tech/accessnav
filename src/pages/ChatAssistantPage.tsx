@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAccessibility } from '../context/AccessibilityContext';
 import { ChatMessage } from '../types';
+import { postApi } from '../lib/api.ts';
 
 export const ChatAssistantPage: React.FC = () => {
   const { user, preferences, speak, stopSpeaking, isSpeaking, triggerHaptic, announce } =
@@ -68,27 +69,20 @@ export const ChatAssistantPage: React.FC = () => {
         content: m.content,
       }));
 
-      const res = await fetch('/api/gemini/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: historyPayload,
-          language: preferences.language,
-          userPreferences: {
-            disabilities: preferences.disabilityTypes,
-          },
-        }),
+      const response = await postApi<any>('/api/gemini/chat', {
+        messages: historyPayload,
+        language: preferences.language,
+        userPreferences: {
+          disabilities: preferences.disabilityTypes,
+        },
       });
 
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Chat failed.');
-      }
+      const messageContent = typeof response === 'string' ? response : (response?.message || 'I am here to help you navigate comfortably.');
 
       const botMsg: ChatMessage = {
         id: Math.random().toString(36).substring(2, 9),
         role: 'model',
-        content: json.message,
+        content: messageContent,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 

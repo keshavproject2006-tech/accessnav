@@ -16,6 +16,7 @@ import { useAccessibility } from '../context/AccessibilityContext';
 import { NavigationResult } from '../types';
 import { saveHistoryItem } from '../lib/firebase';
 import { ChennaiMap } from '../components/ChennaiMap';
+import { postApi } from '../lib/api.ts';
 
 export const NavigationHelperPage: React.FC = () => {
   const { user, speak, stopSpeaking, isSpeaking, triggerHaptic, announce, preferences } =
@@ -78,27 +79,17 @@ export const NavigationHelperPage: React.FC = () => {
     announce(`Planning accessible route to ${target} in Chennai...`, 'polite');
 
     try {
-      const res = await fetch('/api/gemini/navigate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          destination: `${target}, Chennai, Tamil Nadu, India`,
-          currentLocation: currentSpot,
-          accessibilityNeeds: [
-            'Step-free wheelchair routes and elevators',
-            'Tactile ground paving and cane guides',
-            'Tamil Nadu transit and landmark assistance',
-          ],
-          language: preferences.language,
-        }),
+      const data = await postApi<NavigationResult>('/api/gemini/navigate', {
+        destination: `${target}, Chennai, Tamil Nadu, India`,
+        currentLocation: currentSpot,
+        accessibilityNeeds: [
+          'Step-free wheelchair routes and elevators',
+          'Tactile ground paving and cane guides',
+          'Tamil Nadu transit and landmark assistance',
+        ],
+        language: preferences.language,
       });
 
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Failed to generate accessible route.');
-      }
-
-      const data: NavigationResult = json.data;
       setResult(data);
       setActiveView('route');
       triggerHaptic('success');

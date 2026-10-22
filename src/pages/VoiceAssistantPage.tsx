@@ -13,6 +13,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useAccessibility } from '../context/AccessibilityContext';
+import { postApi } from '../lib/api.ts';
 
 export const VoiceAssistantPage: React.FC = () => {
   const {
@@ -131,17 +132,11 @@ export const VoiceAssistantPage: React.FC = () => {
     announce('Processing your voice request...', 'polite');
 
     try {
-      const res = await fetch('/api/gemini/voice-assistant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transcript: textToProcess,
-          language: preferences.language,
-        }),
+      const data = await postApi<any>('/api/gemini/voice-assistant', {
+        transcript: textToProcess,
+        language: preferences.language,
       });
 
-      const json = await res.json();
-      const data = json.data;
       const spoken = data?.spokenResponse || data?.textResponse || 'I have completed your request.';
       const detailedText = data?.textResponse || spoken;
 

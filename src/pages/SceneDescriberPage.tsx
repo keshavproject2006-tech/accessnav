@@ -17,6 +17,7 @@ import {
 import { useAccessibility } from '../context/AccessibilityContext';
 import { SceneResult } from '../types';
 import { saveHistoryItem } from '../lib/firebase';
+import { postApi } from '../lib/api.ts';
 
 export const SceneDescriberPage: React.FC = () => {
   const { user, speak, stopSpeaking, isSpeaking, triggerHaptic, announce } = useAccessibility();
@@ -127,22 +128,12 @@ export const SceneDescriberPage: React.FC = () => {
     );
 
     try {
-      const res = await fetch('/api/gemini/scene-describer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: imageData,
-          detailLevel: level,
-          language: 'en',
-        }),
+      const data = await postApi<SceneResult>('/api/gemini/scene-describer', {
+        image: imageData,
+        detailLevel: level,
+        language: 'en',
       });
 
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Failed to analyze scene.');
-      }
-
-      const data: SceneResult = json.data;
       setResult(data);
       triggerHaptic('success');
 

@@ -16,6 +16,7 @@ import {
 import { useAccessibility } from '../context/AccessibilityContext';
 import { TextSimplifyResult } from '../types';
 import { saveHistoryItem } from '../lib/firebase';
+import { postApi } from '../lib/api.ts';
 
 export const TextReaderPage: React.FC = () => {
   const { user, speak, stopSpeaking, isSpeaking, triggerHaptic, announce } = useAccessibility();
@@ -73,23 +74,13 @@ export const TextReaderPage: React.FC = () => {
     announce(`Simplifying text to ${readingLevel} reading level...`, 'polite');
 
     try {
-      const res = await fetch('/api/gemini/text-simplifier', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: inputMode === 'text' ? inputText : undefined,
-          image: inputMode === 'image' ? documentImage : undefined,
-          readingLevel,
-          language: 'en',
-        }),
+      const data = await postApi<TextSimplifyResult>('/api/gemini/text-simplifier', {
+        text: inputMode === 'text' ? inputText : undefined,
+        image: inputMode === 'image' ? documentImage : undefined,
+        readingLevel,
+        language: 'en',
       });
 
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Failed to simplify text.');
-      }
-
-      const data: TextSimplifyResult = json.data;
       setResult(data);
       triggerHaptic('success');
       announce('Text simplified successfully. Ready to read aloud.', 'polite');

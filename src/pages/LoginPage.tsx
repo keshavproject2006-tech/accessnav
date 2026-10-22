@@ -31,11 +31,17 @@ export const LoginPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [unauthorizedDomain, setUnauthorizedDomain] = useState<string | null>(null);
+  const [domainCopied, setDomainCopied] = useState(false);
 
   const handleError = (error: any) => {
     let msg = 'An unexpected error occurred. Please try again.';
     const code = error?.code || '';
-    if (code.includes('auth/invalid-email')) {
+    if (code.includes('auth/unauthorized-domain')) {
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'your Vercel domain';
+      setUnauthorizedDomain(currentHost);
+      msg = `This domain (${currentHost}) is not authorized yet in your Firebase Project. Please add it to Authorized Domains in Firebase Console.`;
+    } else if (code.includes('auth/invalid-email')) {
       msg = 'The email address format is invalid. Please check for typos.';
     } else if (code.includes('auth/user-not-found') || code.includes('auth/wrong-password') || code.includes('auth/invalid-credential')) {
       msg = 'Incorrect email or password. Please verify your credentials or reset your password.';
@@ -139,10 +145,56 @@ export const LoginPage: React.FC = () => {
         {errorMessage && (
           <div
             role="alert"
-            className="mb-5 p-3.5 bg-red-50 dark:bg-red-950/60 border-2 border-red-600 rounded-xl text-red-800 dark:text-red-200 text-sm flex items-start gap-2.5"
+            className="mb-4 p-3.5 bg-red-50 dark:bg-red-950/60 border-2 border-red-600 rounded-xl text-red-800 dark:text-red-200 text-sm flex items-start gap-2.5"
           >
             <AlertCircle className="w-5 h-5 shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
             <span className="font-medium">{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Step-by-Step Vercel Domain Authorization Help Card */}
+        {unauthorizedDomain && (
+          <div className="mb-5 p-4 bg-amber-50 dark:bg-amber-950/50 border-2 border-amber-500 rounded-2xl text-xs space-y-2 text-amber-950 dark:text-amber-100">
+            <div className="font-bold text-sm flex items-center gap-1.5 text-amber-900 dark:text-amber-300">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+              <span>How to Fix in Firebase Console (1 Minute):</span>
+            </div>
+            <ol className="list-decimal pl-4 space-y-1 text-neutral-700 dark:text-neutral-300">
+              <li>Open your Firebase Console project.</li>
+              <li>Go to <strong>Authentication</strong> &rarr; <strong>Settings</strong> &rarr; <strong>Authorized domains</strong>.</li>
+              <li>Click <strong>Add domain</strong> and paste your domain:</li>
+            </ol>
+            <div className="p-2.5 bg-white dark:bg-neutral-900 rounded-xl border border-amber-300 dark:border-amber-700 font-mono font-bold flex items-center justify-between text-neutral-900 dark:text-white">
+              <span className="truncate mr-2">{unauthorizedDomain}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(unauthorizedDomain);
+                  setDomainCopied(true);
+                  setTimeout(() => setDomainCopied(false), 2000);
+                }}
+                className="px-2.5 py-1 bg-amber-200 hover:bg-amber-300 dark:bg-amber-800 dark:hover:bg-amber-700 text-amber-950 dark:text-amber-100 rounded-lg font-sans text-xs font-bold shrink-0"
+              >
+                {domainCopied ? 'Copied!' : 'Copy Domain'}
+              </button>
+            </div>
+            <div className="pt-1 flex items-center justify-between">
+              <a
+                href="https://console.firebase.google.com/project/sigma-sprite-s4dh4/authentication/settings"
+                target="_blank"
+                rel="noreferrer"
+                className="font-bold underline text-blue-700 dark:text-yellow-400 hover:opacity-80"
+              >
+                Open Firebase Console Settings &rarr;
+              </a>
+              <button
+                type="button"
+                onClick={loginAsGuest}
+                className="font-bold text-neutral-800 dark:text-neutral-200 underline text-[11px]"
+              >
+                Skip & Use as Guest
+              </button>
+            </div>
           </div>
         )}
 

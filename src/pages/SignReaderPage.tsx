@@ -16,6 +16,7 @@ import {
 import { useAccessibility } from '../context/AccessibilityContext';
 import { SignResult } from '../types';
 import { saveHistoryItem } from '../lib/firebase';
+import { postApi } from '../lib/api.ts';
 
 export const SignReaderPage: React.FC = () => {
   const { user, speak, stopSpeaking, isSpeaking, triggerHaptic, announce } = useAccessibility();
@@ -163,22 +164,12 @@ export const SignReaderPage: React.FC = () => {
     announce('Gemini is reading text and analyzing safety instructions...', 'polite');
 
     try {
-      const res = await fetch('/api/gemini/sign-reader', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: imageData,
-          question: question.trim() || undefined,
-          language: 'en',
-        }),
+      const data = await postApi<SignResult>('/api/gemini/sign-reader', {
+        image: imageData,
+        question: question.trim() || undefined,
+        language: 'en',
       });
 
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Failed to read sign.');
-      }
-
-      const data: SignResult = json.data;
       setResult(data);
       triggerHaptic('success');
 
